@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,84 +8,134 @@ import {
   Alert,
   ScrollView,
   Dimensions,
-} from 'react-native';
-import axios from 'axios';
-import { Buffer } from 'buffer';
-import { Picker } from '@react-native-picker/picker';
+  Modal,
+} from "react-native";
+import axios from "axios";
+import { Buffer } from "buffer";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
+
+const CustomPicker = ({ data, selectedLabel, onSelect }) => {
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <View style={{width: Dimensions.get('window').width, paddingHorizontal: 10}}>
+      <TouchableOpacity
+        style={styles.pickerContainer}
+        onPress={() => setVisible(true)}
+      >
+        <Text style={!selectedLabel ? styles.placeholder : styles.selectedText}>
+          {selectedLabel || "Pilih Pertanyaan Keamanan"}
+        </Text>
+      </TouchableOpacity>
+
+      <Modal visible={visible} transparent animationType="fade">
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPressOut={() => setVisible(false)}
+        >
+          <View style={styles.modalContent}>
+            <ScrollView>
+              {data.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={styles.item}
+                  onPress={() => {
+                    onSelect(item.id, item.nama_pertanyaan_keamanan);
+                    setVisible(false);
+                  }}
+                >
+                  <Text>{item.nama_pertanyaan_keamanan}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <TouchableOpacity
+              style={styles.cancelBtn}
+              onPress={() => setVisible(false)}
+            >
+              <Text style={{ color: "white" }}>Batal</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+    </View>
+  );
+};
 
 export default function Signup(props) {
-  const [noHp, setNoHp] = useState('');
-  const [nama, setNama] = useState('');
-  const [passworduser, setPassworduser] = useState('');
-  const [ulangiPassword, setUlangiPassword] = useState('');
-  const [idPertanyaan, setIdPertanyaan] = useState('');
-  const [jawaban, setJawaban] = useState('');
+  const [noHp, setNoHp] = useState("");
+  const [nama, setNama] = useState("");
+  const [passworduser, setPassworduser] = useState("");
+  const [ulangiPassword, setUlangiPassword] = useState("");
+  const [idPertanyaan, setIdPertanyaan] = useState("");
+  const [labelPertanyaan, setLabelPertanyaan] = useState("");
+  const [jawaban, setJawaban] = useState("");
   const [pertanyaanList, setPertanyaanList] = useState([]);
-  
 
-useEffect(() => {
-  const fetchPertanyaan = async () => {
+  useEffect(() => {
+    const fetchPertanyaan = async () => {
+      try {
+        const username = "made";
+        const password = "made_in_bali";
+        const basicAuth =
+          "Basic " + Buffer.from(`${username}:${password}`).toString("base64");
+
+        const response = await axios.get(
+          "https://smpedia.creativeku.my.id/api/v1/pertanyaan_keamanan",
+          {
+            headers: {
+              Authorization: basicAuth,
+            },
+          }
+        );
+
+        setPertanyaanList(response.data.data);
+      } catch (error) {
+        console.error("Error fetching pertanyaan keamanan:", error);
+        Alert.alert("Error", "Gagal mengambil daftar pertanyaan keamanan.");
+      }
+    };
+
+    fetchPertanyaan();
+  }, []);
+
+  const handleSignup = async () => {
     try {
-      const username = 'made';
-      const password = 'made_in_bali';
-      const basicAuth = 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64');
+      const username = "made";
+      const password = "made_in_bali";
+      const basicAuth =
+        "Basic " + Buffer.from(`${username}:${password}`).toString("base64");
 
-      const response = await axios.get('https://smpedia.creativeku.my.id/api/v1/pertanyaan_keamanan', {
-        headers: {
-          Authorization: basicAuth,
-        },
-      });
+      const formBody = new URLSearchParams();
+      formBody.append("no_hp", noHp.trim());
+      formBody.append("nama", nama.trim());
+      formBody.append("password", passworduser);
+      formBody.append("ulangi_password", ulangiPassword);
+      formBody.append("id_pertanyaan_keamanan", idPertanyaan.toString());
+      formBody.append("jawaban_pertanyaan_keamanan", jawaban.trim());
 
-      console.log('Data pertanyaan:', response.data.data);
-      setPertanyaanList(response.data.data); // ✅ ambil isi array dari data
+      const response = await axios.post(
+        "https://smpedia.creativeku.my.id/api/v1/akun_pengguna/daftar",
+        formBody.toString(),
+        {
+          headers: {
+            Authorization: basicAuth,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
+
+      Alert.alert("Sukses", "Akun berhasil dibuat!");
+      props.navigation.navigate("Signin");
     } catch (error) {
-      console.error('Error fetching pertanyaan keamanan:', error);
-      Alert.alert('Error', 'Gagal mengambil daftar pertanyaan keamanan.');
+      console.error("Signup error:", error.response?.data || error.message);
+      Alert.alert(
+        "Gagal",
+        error.response?.data?.meta?.message || "Terjadi kesalahan."
+      );
     }
   };
-
-  fetchPertanyaan();
-}, []);
-
-
-const handleSignup = async () => {
-  try {
-    const username = 'made';
-    const password = 'made_in_bali';
-    const basicAuth = 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64');
-
-    // Gunakan URLSearchParams untuk encode x-www-form-urlencoded
-    const formBody = new URLSearchParams();
-    formBody.append('no_hp', noHp.trim());
-    formBody.append('nama', nama.trim());
-    formBody.append('password', passworduser);
-    formBody.append('ulangi_password', ulangiPassword);
-    formBody.append('id_pertanyaan_keamanan', idPertanyaan.toString());
-    formBody.append('jawaban_pertanyaan_keamanan', jawaban.trim());
-
-    console.log("Form Data Dikirim:", formBody.toString());
-
-    const response = await axios.post(
-      'https://smpedia.creativeku.my.id/api/v1/akun_pengguna/daftar',
-      formBody.toString(),
-      {
-        headers: {
-          Authorization: basicAuth,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      }
-    );
-
-    console.log('Signup success:', response.data);
-    Alert.alert('Sukses', 'Akun berhasil dibuat!');
-    props.navigation.navigate('Signin');
-  } catch (error) {
-    console.error('Signup error:', error.response?.data || error.message);
-    Alert.alert('Gagal', error.response?.data?.meta?.message || 'Terjadi kesalahan.');
-  }
-};
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -95,18 +145,21 @@ const handleSignup = async () => {
         style={styles.input}
         placeholder="No HP"
         value={noHp}
+        placeholderTextColor="#999"
         onChangeText={setNoHp}
         keyboardType="phone-pad"
       />
       <TextInput
         style={styles.input}
         placeholder="Nama"
+        placeholderTextColor="#999"
         value={nama}
         onChangeText={setNama}
       />
       <TextInput
         style={styles.input}
         placeholder="Password"
+        placeholderTextColor="#999"
         value={passworduser}
         onChangeText={setPassworduser}
         secureTextEntry
@@ -114,31 +167,25 @@ const handleSignup = async () => {
       <TextInput
         style={styles.input}
         placeholder="Ulangi Password"
+        placeholderTextColor="#999"
         value={ulangiPassword}
         onChangeText={setUlangiPassword}
         secureTextEntry
       />
 
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={idPertanyaan}
-          onValueChange={(itemValue) => setIdPertanyaan(itemValue)}
-          style={styles.picker}
-        >
-          <Picker.Item label="Pilih Pertanyaan Keamanan" value="" />
-          {pertanyaanList.map((item) => (
-            <Picker.Item
-              key={item.id}
-              label={item.nama_pertanyaan_keamanan}
-              value={item.id}
-            />
-          ))}
-        </Picker>
-      </View>
+      <CustomPicker
+        data={pertanyaanList}
+        selectedLabel={labelPertanyaan}
+        onSelect={(id, label) => {
+          setIdPertanyaan(id);
+          setLabelPertanyaan(label);
+        }}
+      />
 
       <TextInput
         style={styles.input}
         placeholder="Jawaban Pertanyaan Keamanan"
+        placeholderTextColor="#999"
         value={jawaban}
         onChangeText={setJawaban}
       />
@@ -154,53 +201,83 @@ const styles = StyleSheet.create({
   container: {
     padding: 10,
     marginTop: -150,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
     flexGrow: 1,
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#2980b9',
+    fontWeight: "bold",
+    color: "#2980b9",
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   input: {
-    width: '100%',
+    width: "100%",
     height: 50,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 12,
     marginBottom: 16,
     paddingHorizontal: 16,
     fontSize: 16,
-    color: '#000',
+    color: "#000",
   },
   pickerContainer: {
-    width: '100%',
-    borderColor: '#ccc',
+    width: "100%",
+    borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 12,
     marginBottom: 16,
-    overflow: 'hidden',
+    backgroundColor: "#fff",
   },
-  picker: {
-    width: '100%',
-    height: 50,
+  placeholder: {
+    color: "#999",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  selectedText: {
+    color: "#000",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 20,
+    maxHeight: "60%",
+  },
+  item: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  cancelBtn: {
+    marginTop: 10,
+    backgroundColor: "#888",
+    padding: 12,
+    alignItems: "center",
+    borderRadius: 6,
   },
   button: {
-    width: '100%',
+    width: "100%",
     height: 50,
-    backgroundColor: '#2980b9',
+    backgroundColor: "#2980b9",
     borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 10,
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });

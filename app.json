@@ -4,7 +4,7 @@
     "slug": "renang-smpedia",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logorenangnobg.png",
     "scheme": "renangsmpedia",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -16,7 +16,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.renang.smpedia"
     },
     "web": {
       "bundler": "metro",
