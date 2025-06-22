@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { MaterialIcons, Ionicons, Entypo } from '@expo/vector-icons';
 
 import Home from '../screen/Home';
 import WebViewScreen from '../screen/WebviewScreen';
@@ -12,6 +12,7 @@ import Education from '../screen/Education';
 import ProfileUser from '../screen/ProfileUser';
 import AccountInformation from '../screen/AccountInformation';
 import PasswordSecurity from '../screen/PasswordSecurity';
+import webViewDrive from '../screen/webviewDrive';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -128,11 +129,26 @@ export default function AppStackNavigator() {
       <Stack.Screen
         name="AccountInformation"
         component={AccountInformation}
-        options={{ headerShown: false }}
+        options={{
+          header: (props) => <HeaderName {...props} />,
+          drawerIcon: ({ size, color }) => (
+            <Entypo name="line-graph" color={color} size={size} />
+          ),
+        }}
       />
       <Stack.Screen
         name="PasswordSecurity"
         component={PasswordSecurity}
+        options={{
+          header: (props) => <HeaderName {...props} />,
+          drawerIcon: ({ size, color }) => (
+            <Entypo name="line-graph" color={color} size={size} />
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="webviewdrive"
+        component={webViewDrive}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

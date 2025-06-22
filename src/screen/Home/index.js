@@ -282,7 +282,7 @@ const getSubSubMenu = async (id) => {
                           }}
                           numberOfLines={2}
                         >
-                          {item.deskripsi_sub_menu }
+                          {item.deskripsi_sub_menu}
                         </Text>
                       ) : null}
                     </View>
@@ -360,6 +360,28 @@ const getSubSubMenu = async (id) => {
                         🔗 Buka Link Latihan
                       </Text>
                     )}
+
+                    {selectedSubSubMenu.file &&
+                      selectedSubSubMenu.file.length > 0 && (
+                        <TouchableOpacity
+                          style={{
+                            backgroundColor: "#007bff",
+                            padding: 10,
+                            marginTop: 10,
+                            borderRadius: 6,
+                          }}
+                          onPress={() =>
+                            props.navigation.navigate("webviewdrive", {
+                              url: selectedSubSubMenu.file[0].file_path, // atau file yang dipilih
+                            })
+                          }
+                        >
+                          <Text style={{ color: "#fff", textAlign: "center" }}>
+                            📄 Lihat File:{" "}
+                            {selectedSubSubMenu.file[0].judul_file}
+                          </Text>
+                        </TouchableOpacity>
+                      )}
 
                     {selectedSubSubMenu.item?.length > 0 && (
                       <View style={{ marginTop: 10 }}>
@@ -595,7 +617,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'white',
+    width: '100%',
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
     zIndex: 1,

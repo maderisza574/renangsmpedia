@@ -13,13 +13,11 @@ import { Entypo, Ionicons, Feather, Octicons } from "@expo/vector-icons";
 import axios from 'axios';
 import { Buffer } from 'buffer';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import ComponentProfile from "../Profile"
 
 
 const ProfileUser= (props) => {
-
-
-
-
+  console.log("ini adalah props", props)
   const profile = {
     name: "Putri Amalia",
     email: "putriamalia@gmail.com",
@@ -62,6 +60,14 @@ const ProfileUser= (props) => {
     ],
     { cancelable: false }
   );
+}
+
+const handleWebView = () => {
+  try {
+    props?.navigation.navigate("webviewdrive");
+  } catch (error) {
+    console.log("INI EROR")
+  }
 }
 
 
@@ -128,8 +134,12 @@ const ProfileUser= (props) => {
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
           ListHeaderComponent={
-            <View style={{ alignItems: "center", marginBottom: 30, marginTop: 30 }}>
-              <Text style={{fontWeight: 'bold', fontSize: 18, color: 'black'}}>
+            <View
+              style={{ alignItems: "center", marginBottom: 30, marginTop: 30 }}
+            >
+              <Text
+                style={{ fontWeight: "bold", fontSize: 18, color: "black" }}
+              >
                 Account & Security
               </Text>
             </View>
@@ -168,8 +178,47 @@ const ProfileUser= (props) => {
                 >
                   Logout
                 </Text>
+
                 <Entypo name="chevron-right" size={20} color="#9CA3AF" />
               </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  backgroundColor: "white",
+                  paddingVertical: 12,
+                  paddingHorizontal: 16,
+                  borderRadius: 16,
+                  borderWidth: 1,
+                  borderColor: "#fff", // Merah muda lembut
+                  shadowColor: "#bbeaff",
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 4,
+                  elevation: 10,
+                }}
+                onPress={handleWebView}
+              >
+                <Entypo name="log-out" size={20} color="#6B7280" />
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    color: "#6B7280",
+                    marginTop: 10,
+                    marginLeft: -180,
+                    marginBottom: 10,
+                  }}
+                >
+                  WEBVIEW TES
+                </Text>
+
+                <Entypo name="chevron-right" size={20} color="#9CA3AF" />
+              </TouchableOpacity>
+              <View>
+                <ComponentProfile />
+              </View>
               <View style={{ height: Dimensions.get("window").height * 0.2 }} />
             </>
           }
