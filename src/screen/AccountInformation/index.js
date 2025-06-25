@@ -112,13 +112,9 @@ const AccountInformation = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar
-        translucent
-        backgroundColor={"transparent"}
-        barStyle="dark-content"
-      />
+     
 
-      <View style={{ alignSelf: "center", marginTop: 30 }}>
+      <View style={{ alignSelf: "center", marginTop: -45}}>
         <Text style={{ fontSize: 18, fontWeight: "bold", color: "black" }}>
           AccountInformation
         </Text>

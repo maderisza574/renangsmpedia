@@ -111,7 +111,7 @@ const PasswordSecurity = () => {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.container}>
-          <StatusBar barStyle="dark-content" />
+        
 
           <Text style={styles.title}>Change Password</Text>
           <Text style={styles.subtitle}>Please enter your password</Text>
@@ -174,6 +174,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    marginTop: -40
   },
   title: {
     fontSize: 22,

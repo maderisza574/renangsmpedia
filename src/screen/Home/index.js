@@ -22,6 +22,8 @@ import { Buffer } from 'buffer';
 import { Entypo } from '@expo/vector-icons';
 import ComponentProfile from "../Profile"
 import Feather from "@expo/vector-icons/Feather";
+import { WebView } from "react-native-webview";
+import LogoBPI from '../LogoBPI';
 
 export default function Home(props) {
   const HEADER_HEIGHT = 250;
@@ -36,7 +38,15 @@ export default function Home(props) {
   const [modalLevel, setModalLevel] = useState('submenu'); // submenu atau subsubmenu
   const [selectedSubSubMenu, setSelectedSubSubMenu] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [showWebView, setShowWebView] = useState(false);
 
+  const getGoogleReaderUrl = (url) =>
+    `https://docs.google.com/viewer?url=${encodeURIComponent(url)}`;
+
+  const getGoogleDriveUrl = (url) =>
+    `https://drive.google.com/viewerng/viewer?embedded=true&url=${encodeURIComponent(
+      url
+    )}`;
   console.log("INI DATA SUB SUB MENU", selectedSubSubMenu);
   const getRandomPastelColor = () => {
     const hue = Math.floor(Math.random() * 360);
@@ -220,6 +230,36 @@ const getSubSubMenu = async (id) => {
         transparent={true}
       >
         <View style={{ flex: 1, backgroundColor: "#bbeaff", padding: 20 }}>
+          {/* Ikon Home di kiri atas */}
+          <TouchableOpacity
+            onPress={() => {
+              setModalVisible(false);
+              setTimeout(() => {
+                props.navigation.navigate("Main");
+              }, 300);
+            }}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: "#fff", // latar putih
+              paddingVertical: 10,
+              paddingHorizontal: 15,
+              borderRadius: 10,
+              marginBottom: 10,
+              alignSelf: "flex-start", // agar tidak full lebar
+              elevation: 3, // efek bayangan (Android)
+              shadowColor: "#000", // efek bayangan (iOS)
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 3,
+            }}
+          >
+            <Feather name="home" size={24} color="black" />
+            <Text style={{ marginLeft: 8, fontSize: 16, color: "black" }}>
+              Home
+            </Text>
+          </TouchableOpacity>
+
           <View style={{ flex: 1 }}>
             <FlatList
               data={
@@ -363,24 +403,66 @@ const getSubSubMenu = async (id) => {
 
                     {selectedSubSubMenu.file &&
                       selectedSubSubMenu.file.length > 0 && (
-                        <TouchableOpacity
-                          style={{
-                            backgroundColor: "#007bff",
-                            padding: 10,
-                            marginTop: 10,
-                            borderRadius: 6,
-                          }}
-                          onPress={() =>
-                            props.navigation.navigate("webviewdrive", {
-                              url: selectedSubSubMenu.file[0].file_path, // atau file yang dipilih
-                            })
-                          }
-                        >
-                          <Text style={{ color: "#fff", textAlign: "center" }}>
-                            📄 Lihat File:{" "}
-                            {selectedSubSubMenu.file[0].judul_file}
-                          </Text>
-                        </TouchableOpacity>
+                        <>
+                          {!showWebView && (
+                            <TouchableOpacity
+                              style={{
+                                backgroundColor: "#007bff",
+                                padding: 10,
+                                marginTop: 10,
+                                borderRadius: 6,
+                              }}
+                              onPress={() => setShowWebView(true)}
+                            >
+                              <Text
+                                style={{ color: "#fff", textAlign: "center" }}
+                              >
+                                📄 Lihat File:{" "}
+                                {selectedSubSubMenu.file[0].judul_file}
+                              </Text>
+                            </TouchableOpacity>
+                          )}
+
+                          {showWebView && (
+                            <View
+                              style={{
+                                height: Dimensions.get("window").height * 0.6,
+                                marginTop: 10,
+                                borderRadius: 10,
+                                overflow: "hidden",
+                              }}
+                            >
+                              <WebView
+                                source={{
+                                  uri: `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(
+                                    selectedSubSubMenu.file[0].file_path
+                                  )}`,
+                                }}
+                                javaScriptEnabled
+                                domStorageEnabled
+                                startInLoadingState
+                              />
+                              <TouchableOpacity
+                                style={{
+                                  backgroundColor: "#e74c3c",
+                                  padding: 10,
+                                  borderBottomLeftRadius: 10,
+                                  borderBottomRightRadius: 10,
+                                }}
+                                onPress={() => setShowWebView(false)}
+                              >
+                                <Text
+                                  style={{
+                                    color: "#fff",
+                                    textAlign: "center",
+                                  }}
+                                >
+                                  ❌ Tutup File
+                                </Text>
+                              </TouchableOpacity>
+                            </View>
+                          )}
+                        </>
                       )}
 
                     {selectedSubSubMenu.item?.length > 0 && (
@@ -420,8 +502,10 @@ const getSubSubMenu = async (id) => {
               }
             />
           </View>
-
-          {/* Tombol di bawah FlatList */}
+          <View style={{ marginTop: 10 }}>
+            <LogoBPI />
+          </View>
+          {/* Tombol Tutup / Kembali */}
           <TouchableOpacity
             onPress={() => {
               if (modalLevel === "detail") {
@@ -516,7 +600,13 @@ const getSubSubMenu = async (id) => {
       </LinearGradient>
 
       {/* Konten di bawah header */}
-      <View style={{ marginTop: 250, height: Dimensions.get("window") - 300 }}>
+      <View
+        style={{
+          marginTop: 250,
+          height: Dimensions.get("window") - 300,
+          backgroundColor: "#bbeaff",
+        }}
+      >
         <FlatList
           style={{ marginTop: -20 }}
           data={[]} // data utama kosong, fokus ke footer
@@ -595,6 +685,9 @@ const getSubSubMenu = async (id) => {
                     <View style={{ marginTop: 10 }}>
                       <ComponentProfile />
                     </View>
+                    <View style={{ marginTop: 10 }}>
+                      <LogoBPI />
+                    </View>
                   </>
                 }
                 ListEmptyComponent={<Text>Menu belum tersedia</Text>}
@@ -612,29 +705,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-    containerTop: {
-    position: 'absolute',
+  containerTop: {
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
-    width: '100%',
+    width: "100%",
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
     zIndex: 1,
-    elevation: 5, 
-  
+    elevation: 5,
   },
 
   headerText: {
-    color: 'white',
+    color: "white",
     fontSize: 20,
     paddingTop: 40,
   },
   containerBottom: {
-    backgroundColor: 'white',
-    minHeight: Dimensions.get('window').height,
+    backgroundColor: "#bbeaff",
+    minHeight: Dimensions.get("window").height,
     paddingTop: 150,
     paddingHorizontal: 15,
-    
   },
 });

@@ -135,7 +135,7 @@ const handleWebView = () => {
           renderItem={renderItem}
           ListHeaderComponent={
             <View
-              style={{ alignItems: "center", marginBottom: 30, marginTop: 30 }}
+              style={{ alignItems: "center", marginBottom: 30, marginTop: -20 }}
             >
               <Text
                 style={{ fontWeight: "bold", fontSize: 18, color: "black" }}
@@ -181,7 +181,7 @@ const handleWebView = () => {
 
                 <Entypo name="chevron-right" size={20} color="#9CA3AF" />
               </TouchableOpacity>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
@@ -215,10 +215,10 @@ const handleWebView = () => {
                 </Text>
 
                 <Entypo name="chevron-right" size={20} color="#9CA3AF" />
-              </TouchableOpacity>
-              <View>
+              </TouchableOpacity> */}
+              {/* <View>
                 <ComponentProfile />
-              </View>
+              </View> */}
               <View style={{ height: Dimensions.get("window").height * 0.2 }} />
             </>
           }

@@ -1,48 +1,40 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import Feather from '@expo/vector-icons/Feather';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import React from "react";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
+import Feather from "@expo/vector-icons/Feather";
 
 export default function DefaultHeader(props) {
-  const backScreen = () => {
-    props.navigation.goBack();
+  const goHome = () => {
+    props.navigation.navigate("Main");
   };
+
   return (
     <View style={styles.header}>
-      <View>
-        <TouchableOpacity onPress={backScreen} style={styles.section}>
-          <Feather name="arrow-left" size={24} color="black" />
-        </TouchableOpacity>
-      </View>
+      {/* Tombol Home di kiri */}
+      <TouchableOpacity onPress={goHome} style={styles.section}>
+        <Feather name="home" size={24} color="black" />
+      </TouchableOpacity>
+
+      {/* Spacer (kalau nanti mau tambahin judul di tengah) */}
+      <View style={styles.sectionCenter} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingTop: 50,
     paddingBottom: 10,
     paddingHorizontal: 25,
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
   section: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   sectionCenter: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backText: {
-    color: 'white',
-    fontSize: 16,
-    marginLeft: 5,
-  },
-  titleText: {
-    color: 'white',
-    fontSize: 18,
   },
 });
