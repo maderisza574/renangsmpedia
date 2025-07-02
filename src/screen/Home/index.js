@@ -682,10 +682,10 @@ const getSubSubMenu = async (id) => {
                 )}
                 ListFooterComponent={
                   <>
-                    <View style={{ marginTop: 10 }}>
+                    {/* <View style={{ marginTop: 10 }}>
                       <ComponentProfile />
-                    </View>
-                    <View style={{ marginTop: 10 }}>
+                    </View> */}
+                    <View style={{ marginTop: 50 }}>
                       <LogoBPI />
                     </View>
                   </>

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { MaterialIcons, Ionicons, Entypo } from '@expo/vector-icons';
+import { MaterialIcons, Ionicons, Entypo, AntDesign } from '@expo/vector-icons';
 
 import Home from '../screen/Home';
 import WebViewScreen from '../screen/WebviewScreen';
@@ -56,6 +56,28 @@ function BottomTabNavigator() {
             <View style={styles.labelContainer}>
               <Text style={[styles.label, focused && styles.activeLabel]}>
                 Home
+              </Text>
+              {focused && <View style={styles.activeDivider} />}
+            </View>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="About"
+        component={Profile}
+        options={{
+          headerShown: false, // ✅ di sini saja
+          tabBarIcon: ({ focused }) => (
+            <AntDesign
+              name="idcard"
+              size={24}
+              color={focused ? "#2980b9" : "gray"}
+            />
+          ),
+          tabBarLabel: ({ focused }) => (
+            <View style={styles.labelContainer}>
+              <Text style={[styles.label, focused && styles.activeLabel]}>
+                About
               </Text>
               {focused && <View style={styles.activeDivider} />}
             </View>
