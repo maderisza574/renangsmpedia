@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StatusBar } from "react-native";
+import { View } from "react-native";
 import { WebView } from "react-native-webview";
 
 export default function WebViewDrive() {

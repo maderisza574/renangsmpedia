@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -7,9 +7,18 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Animated,
-} from "react-native";
-import axios from "axios";
-import { Buffer } from "buffer";
+  ScrollView,
+  StatusBar,
+  Platform,
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import axios from 'axios';
+import { Buffer } from 'buffer';
+
+import WaveBottom from '../../components/WaveBottom';
+import SwimmerLogo from '../../components/SwimmerLogo';
+import LogoBPI from '../LogoBPI';
+import { Colors, Gradients, Shadows } from '../../constants/theme';
 
 export default function ComponentProfile() {
   const [dataProfile, setDataProfile] = useState(null);
@@ -17,9 +26,8 @@ export default function ComponentProfile() {
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [scaleAnim] = useState(new Animated.Value(1));
 
-  const basicAuth =
-    "Basic " + Buffer.from("made:made_in_bali").toString("base64");
-  const urlProfile = "https://smpedia.creativeku.my.id/api/v1/profile";
+  const basicAuth = 'Basic ' + Buffer.from('made:made_in_bali').toString('base64');
+  const urlProfile = 'https://smpedia.creativeku.my.id/api/v1/profile';
 
   useEffect(() => {
     const getDataProfile = async () => {
@@ -29,7 +37,7 @@ export default function ComponentProfile() {
         });
         setDataProfile(response.data.data);
       } catch (error) {
-        console.error("Gagal ambil data profile:", error);
+        console.error('Gagal ambil data profile:', error);
       } finally {
         setLoading(false);
       }
@@ -55,109 +63,175 @@ export default function ComponentProfile() {
   };
 
   const truncateText = (text, maxLength) => {
-    if (!text) return "";
-    return text.length > maxLength
-      ? text.substring(0, maxLength) + "..."
-      : text;
+    if (!text) return '';
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
 
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="small" color="#2980b9" />
-      </View>
-    );
-  }
-
-  if (!dataProfile) return null;
-
   return (
-    <View style={styles.card}>
-      <Image
-        source={{ uri: dataProfile.gambar }}
-        style={styles.image}
-        resizeMode="contain"
-      />
-      <Text style={styles.title}>{dataProfile.judul}</Text>
-      <Text style={styles.description}>
-        {showFullDesc
-          ? dataProfile.deskripsi
-          : truncateText(dataProfile.deskripsi, 120)}
-      </Text>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
 
-      {dataProfile.deskripsi.length > 120 && (
-        <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-          <TouchableOpacity
-            onPress={handleToggleDesc}
-            style={styles.button}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.buttonText}>
-              {showFullDesc ? "Lebih Sedikit" : "Selengkapnya"}
+      {/* Header with Gradient and Wave */}
+      <View style={styles.headerContainer}>
+        <LinearGradient
+          colors={Gradients.header}
+          start={Gradients.headerCoords.start}
+          end={Gradients.headerCoords.end}
+          style={styles.headerGradient}
+        >
+          <View style={styles.headerRow}>
+            <View>
+              <Text style={styles.headerTitle}>Tentang Aplikasi</Text>
+              <Text style={styles.headerSub}>SMPedia Pembelajaran Renang</Text>
+            </View>
+            <SwimmerLogo size={52} />
+          </View>
+          <WaveBottom color={Colors.background} height={28} />
+        </LinearGradient>
+      </View>
+
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={Colors.primary} />
+          </View>
+        ) : dataProfile ? (
+          <View style={styles.card}>
+            {dataProfile.gambar ? (
+              <Image
+                source={{ uri: dataProfile.gambar }}
+                style={styles.image}
+                resizeMode="contain"
+              />
+            ) : (
+              <View style={styles.placeholderImg}>
+                <SwimmerLogo size={70} />
+              </View>
+            )}
+
+            <Text style={styles.title}>{dataProfile.judul}</Text>
+            <Text style={styles.description}>
+              {showFullDesc
+                ? dataProfile.deskripsi
+                : truncateText(dataProfile.deskripsi, 180)}
             </Text>
-          </TouchableOpacity>
-        </Animated.View>
-      )}
+
+            {dataProfile.deskripsi && dataProfile.deskripsi.length > 180 && (
+              <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+                <TouchableOpacity
+                  onPress={handleToggleDesc}
+                  style={styles.button}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.buttonText}>
+                    {showFullDesc ? 'Lebih Sedikit' : 'Selengkapnya'}
+                  </Text>
+                </TouchableOpacity>
+              </Animated.View>
+            )}
+          </View>
+        ) : null}
+
+        <View style={{ marginTop: 20 }}>
+          <LogoBPI />
+        </View>
+
+        <View style={{ height: 100 }} />
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  loadingContainer: {
+  container: {
     flex: 1,
-    padding: 20,
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: Colors.background,
+  },
+  headerContainer: {
+    width: '100%',
+    overflow: 'hidden',
+  },
+  headerGradient: {
+    paddingTop: Platform.OS === 'ios' ? 55 : (StatusBar.currentHeight || 28) + 16,
+    paddingBottom: 40,
+    paddingHorizontal: 22,
+    position: 'relative',
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: Colors.white,
+  },
+  headerSub: {
+    fontSize: 13,
+    color: 'rgba(255, 255, 255, 0.9)',
+    marginTop: 2,
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 18,
+    paddingTop: 12,
+  },
+  loadingContainer: {
+    padding: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   card: {
-    marginTop: 100,
-    margin: 20,
-    backgroundColor: "#ffffff",
-    borderRadius: 16,
-    padding: 16,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 6 },
-    shadowRadius: 10,
-    elevation: 5,
-    alignItems: "center",
+    backgroundColor: Colors.cardBackground,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    padding: 20,
+    alignItems: 'center',
+    ...Shadows.card,
   },
   image: {
-    width: "80",
-    height: 80,
-    borderRadius: 12,
-    marginBottom: 14,
+    width: 120,
+    height: 120,
+    borderRadius: 16,
+    marginBottom: 16,
+  },
+  placeholderImg: {
+    marginBottom: 16,
   },
   title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#34495e",
-    marginBottom: 8,
-    textAlign: "center",
+    fontSize: 20,
+    fontWeight: '800',
+    color: Colors.textPrimary,
+    marginBottom: 10,
+    textAlign: 'center',
   },
   description: {
-    fontSize: 15,
-    color: "#606060",
+    fontSize: 14,
+    color: Colors.textSecondary,
     lineHeight: 22,
-    textAlign: "center",
-    marginBottom: 10,
+    textAlign: 'center',
+    marginBottom: 16,
   },
   button: {
-    marginTop: 4,
-    backgroundColor: "#3498db",
-    paddingHorizontal: 18,
-    paddingVertical: 8,
-    borderRadius: 30,
-    shadowColor: "#3498db",
-    shadowOpacity: 0.4,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: Colors.primaryButton,
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    borderRadius: 25,
+    ...Shadows.glow,
   },
   buttonText: {
-    color: "#fff",
-    fontWeight: "600",
+    color: Colors.white,
+    fontWeight: '700',
     fontSize: 14,
-    textAlign: "center",
+    textAlign: 'center',
   },
 });

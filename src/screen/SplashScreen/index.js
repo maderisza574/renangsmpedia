@@ -1,21 +1,44 @@
-import React, { useEffect, useRef } from 'react';
-import { StyleSheet, View, Animated, Image, Dimensions, Text, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  StyleSheet,
+  View,
+  Animated,
+  Dimensions,
+  Text,
+  ActivityIndicator,
+  StatusBar,
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { Buffer } from 'buffer';
 
+import SwimmerLogo from '../../components/SwimmerLogo';
+import SplashWaves from '../../components/SplashWaves';
+import { Colors, Gradients } from '../../constants/theme';
+
+const { width } = Dimensions.get('window');
+
 export default function SplashScreen({ navigation }) {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [fadeAnim] = useState(() => new Animated.Value(0));
+  const [slideAnim] = useState(() => new Animated.Value(20));
 
   useEffect(() => {
-    // Animasi fade-in logo
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 1500,
-      useNativeDriver: true,
-    }).start();
+    // Animasi fade-in dan slide-up
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 1200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 1200,
+        useNativeDriver: true,
+      }),
+    ]).start();
 
-    // Mulai pengecekan login
+    // Pengecekan login
     const checkLogin = async () => {
       const storedUsername = await AsyncStorage.getItem('username');
       const storedPassword = await AsyncStorage.getItem('password');
@@ -41,17 +64,16 @@ export default function SplashScreen({ navigation }) {
 
           if (response.status === 200) {
             await AsyncStorage.setItem('userData', JSON.stringify(response.data.data));
-            navigation?.replace('AppScreen');
+            setTimeout(() => navigation?.replace('AppScreen'), 2000);
           } else {
-            navigation?.replace('AuthScreen');
+            setTimeout(() => navigation?.replace('AuthScreen'), 2000);
           }
         } catch (error) {
           console.log('Auto login error:', error.message);
-          navigation?.replace('AuthScreen');
+          setTimeout(() => navigation?.replace('AuthScreen'), 2000);
         }
       } else {
-        // Jika tidak ada data login tersimpan
-        setTimeout(() => navigation?.replace('AuthScreen'), 3000);
+        setTimeout(() => navigation?.replace('AuthScreen'), 2400);
       }
     };
 
@@ -59,36 +81,82 @@ export default function SplashScreen({ navigation }) {
   }, [navigation]);
 
   return (
-    <View style={styles.container}>
-      <Animated.Image
-        source={require('../../../assets/images/logorenangnobg.png')}
-        style={[styles.logo, { opacity: fadeAnim }]}
-        resizeMode="contain"
-      />
-      <Text style={styles.title}>Renang SMPedia</Text>
-      <ActivityIndicator size="large" color="#2980b9" style={{ marginTop: 20 }} />
-    </View>
+    <LinearGradient
+      colors={['#0090E0', '#00AEE6', '#00BCD4']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0.3, y: 1 }}
+      style={styles.container}
+    >
+      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+
+      {/* Main Center Content */}
+      <Animated.View
+        style={[
+          styles.contentWrapper,
+          {
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          },
+        ]}
+      >
+        {/* Swimmer Logo Badge */}
+        <View style={styles.logoContainer}>
+          <SwimmerLogo size={140} strokeWidth={2.5} />
+        </View>
+
+        {/* Title & Subtitle from design */}
+        <Text style={styles.title}>Ayo Belajar{'\n'}Renang!</Text>
+        <Text style={styles.subtitle}>Jadi lebih percaya diri{'\n'}di air bersama kami</Text>
+
+        <ActivityIndicator size="small" color={Colors.white} style={styles.loader} />
+      </Animated.View>
+
+      {/* Multi-layered flowing water waves at bottom */}
+      <SplashWaves height={250} />
+    </LinearGradient>
   );
 }
-
-const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
   },
-  logo: {
-    width: width * 0.6,
-    height: width * 0.6,
+  contentWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 30,
+    marginTop: -50,
+    zIndex: 10,
+  },
+  logoContainer: {
+    marginBottom: 24,
+    shadowColor: '#004077',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 14,
+    elevation: 8,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#2980b9',
-    marginBottom: 30,
+    fontSize: 32,
+    fontWeight: '800',
+    color: Colors.white,
     textAlign: 'center',
+    marginBottom: 12,
+    letterSpacing: 0.5,
+    lineHeight: 38,
+  },
+  subtitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: 'rgba(255, 255, 255, 0.95)',
+    textAlign: 'center',
+    lineHeight: 22,
+    letterSpacing: 0.2,
+  },
+  loader: {
+    marginTop: 28,
   },
 });

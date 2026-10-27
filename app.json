@@ -4,47 +4,45 @@
     "slug": "renang-smpedia",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/logorenangnobg.png",
+    "icon": "./assets/images/icon.png",
     "scheme": "renangsmpedia",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/logorenangnobg.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#0090E0"
       },
-      "edgeToEdgeEnabled": true,
       "package": "com.renang.smpedia"
     },
     "web": {
       "bundler": "metro",
-      "output": "static",
+      "output": "single",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router",
       [
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#0090E0"
         }
       ],
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-font",
+      "expo-asset",
+      "expo-image",
+      "expo-status-bar"
     ],
-    "experiments": {
-      "typedRoutes": true
-    },
     "extra": {
-      "router": {},
       "eas": {
-        "projectId": "84b02119-d2a9-4062-b682-d0c30f997baf"
+        "projectId": "3a9887da-9d7d-413e-adf8-00ab5b7c2ca1"
       }
-    }
+    },
+    "owner": "maderisza"
   }
 }

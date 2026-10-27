@@ -6,16 +6,21 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
-  Image,
   Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StatusBar,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Buffer } from "buffer";
+import { Feather } from "@expo/vector-icons";
+
+import SwimmerLogo from "../../components/SwimmerLogo";
+import SplashWaves from "../../components/SplashWaves";
+import { Colors, Gradients, Shadows } from "../../constants/theme";
 
 const { width } = Dimensions.get("window");
 
@@ -26,7 +31,7 @@ export default function Signin(props) {
 
   const handleLogin = async () => {
     if (!username || !password) {
-      Alert.alert("Error", "Mohon isi semua field");
+      Alert.alert("Perhatian", "Mohon masukkan Username / No. HP dan Password Anda.");
       return;
     }
 
@@ -51,7 +56,6 @@ export default function Signin(props) {
       if (response.status === 200) {
         const userData = response.data.data;
 
-        // Simpan ke AsyncStorage
         await AsyncStorage.multiSet([
           ["username", username],
           ["password", password],
@@ -61,21 +65,17 @@ export default function Signin(props) {
         props.navigation.replace("AppScreen");
       } else {
         Alert.alert(
-          "Login gagal",
-          response.data.message || "Terjadi kesalahan"
+          "Login Gagal",
+          response.data.message || "Periksa kembali data Anda."
         );
       }
     } catch (error) {
       if (error.response) {
         const message =
-          error.response.data?.meta?.message || "Terjadi kesalahan";
-        Alert.alert("Login gagal", message);
-        console.log(
-          "Full error response:",
-          JSON.stringify(error.response.data, null, 2)
-        );
+          error.response.data?.meta?.message || "Terjadi kesalahan pada server.";
+        Alert.alert("Login Gagal", message);
       } else {
-        Alert.alert("Error", "Gagal terhubung ke server");
+        Alert.alert("Koneksi Bermasalah", "Gagal terhubung ke server.");
       }
     } finally {
       setLoading(false);
@@ -84,57 +84,71 @@ export default function Signin(props) {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: Colors.background }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
+      <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
       <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
         <View style={styles.container}>
-          <Image
-            source={require("../../../assets/images/logorenangnobg.png")}
-            style={styles.logo}
-            resizeMode="contain"
-          />
+          {/* Logo Badge */}
+          <View style={styles.logoWrapper}>
+            <SwimmerLogo size={105} />
+          </View>
 
-          <Text style={styles.title}>Login</Text>
+          <Text style={styles.appTitle}>Ayo Belajar Renang!</Text>
+          <Text style={styles.appSub}>Silakan masuk untuk melanjutkan belajar</Text>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Username atau No. HP"
-            placeholderTextColor="#aaa"
-            onChangeText={setUsername}
-            value={username}
-            autoCapitalize="none"
-            keyboardType="phone-pad"
-          />
+          {/* Form Card */}
+          <View style={styles.card}>
+            <View style={styles.inputContainer}>
+              <Feather name="phone" size={20} color={Colors.textSecondary} style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Username atau No. HP"
+                placeholderTextColor={Colors.textSecondary}
+                onChangeText={setUsername}
+                value={username}
+                autoCapitalize="none"
+                keyboardType="phone-pad"
+              />
+            </View>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            placeholderTextColor="#aaa"
-            secureTextEntry
-            onChangeText={setPassword}
-            value={password}
-          />
+            <View style={styles.inputContainer}>
+              <Feather name="lock" size={20} color={Colors.textSecondary} style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Password"
+                placeholderTextColor={Colors.textSecondary}
+                secureTextEntry
+                onChangeText={setPassword}
+                value={password}
+              />
+            </View>
 
-          <TouchableOpacity
-            onPress={handleLogin}
-            style={styles.buttonContainer}
-            disabled={loading}
-          >
-            <LinearGradient
-              colors={loading ? ["#ccc", "#eee"] : ["#2980b9", "#6dd5fa"]}
-              style={styles.button}
+            <TouchableOpacity
+              onPress={handleLogin}
+              style={styles.buttonContainer}
+              disabled={loading}
+              activeOpacity={0.85}
             >
-              <Text style={styles.buttonText}>
-                {loading ? "Loading..." : "Login"}
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
+              <LinearGradient
+                colors={loading ? ["#b0bec5", "#cfd8dc"] : Gradients.primary}
+                start={Gradients.primaryCoords.start}
+                end={Gradients.primaryCoords.end}
+                style={styles.button}
+              >
+                <Text style={styles.buttonText}>
+                  {loading ? "Memproses..." : "Masuk Sekarang →"}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
 
-          <View style={styles.signupContainer}>
+          <View style={styles.footerLinks}>
             <Text style={styles.signupText}>
               Belum punya akun?{" "}
               <Text
@@ -162,66 +176,90 @@ export default function Signin(props) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 24,
-    justifyContent: "center",
-    backgroundColor: "#fff",
+    paddingHorizontal: 24,
+    paddingVertical: 36,
     alignItems: "center",
+    justifyContent: "center",
   },
-  logo: {
-    width: width * 0.5,
-    height: width * 0.5,
-    marginBottom: 10,
+  logoWrapper: {
+    marginBottom: 16,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#2980b9",
-    marginBottom: 30,
+  appTitle: {
+    fontSize: 26,
+    fontWeight: "800",
+    color: Colors.textPrimary,
     textAlign: "center",
+    letterSpacing: 0.3,
+  },
+  appSub: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    textAlign: "center",
+    marginTop: 4,
+    marginBottom: 24,
+  },
+  card: {
+    width: "100%",
+    backgroundColor: Colors.cardBackground,
+    borderRadius: 22,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    padding: 20,
+    ...Shadows.card,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F7FDFF",
+    borderWidth: 1.2,
+    borderColor: Colors.border,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    height: 52,
+    marginBottom: 14,
+  },
+  inputIcon: {
+    marginRight: 10,
   },
   input: {
-    width: "100%",
-    height: 50,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 12,
-    marginBottom: 20,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    color: "#000",
+    flex: 1,
+    height: "100%",
+    fontSize: 15,
+    color: Colors.textPrimary,
   },
   buttonContainer: {
-    marginTop: 10,
+    marginTop: 6,
     width: "100%",
   },
   button: {
     height: 50,
-    borderRadius: 12,
+    borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
+    ...Shadows.glow,
   },
   buttonText: {
-    color: "#fff",
+    color: Colors.white,
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "700",
+    letterSpacing: 0.3,
   },
-  signupContainer: {
-    marginTop: 20,
+  footerLinks: {
+    marginTop: 22,
     alignItems: "center",
   },
   signupText: {
     fontSize: 14,
-    color: "#555",
+    color: Colors.textSecondary,
   },
   signupLink: {
-    color: "#2980b9",
-    fontWeight: "bold",
+    color: Colors.primary,
+    fontWeight: "700",
   },
   forgotPasswordText: {
     fontSize: 14,
-    color: "#555",
+    color: Colors.textSecondary,
     marginTop: 10,
   },
 });
